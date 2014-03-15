@@ -4,6 +4,7 @@ class Caskbot::Plugins::Hash
   include Cinch::Plugin
 
   match %r{hash (https?://.+)}
+  @@commands = ['hash']
 
   def execute(m, url)
     digest = Digest::SHA2.new(256)
