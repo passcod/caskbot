@@ -2,8 +2,25 @@ require 'bundler'
 Bundler.require :default
 
 module Caskbot
-  @@github = Github.new oauth_token: ENV['GITHUB_TOKEN']
-  def self.github; @@github; end
+  class << self
+    extend Memoist
+
+    def github
+      Github.new do |c|
+        c.oauth_token = ENV['GITHUB_TOKEN']
+        c.repo = ENV['GITHUB_REPO']
+        c.user = ENV['GITHUB_USER']
+      end
+    end
+
+    def config
+      c = Hashie::Mash.new
+      ENV.each { |k,v| c[k.downcase] = v }
+      return c
+    end
+
+    memoize :github, :config
+  end
 end
 
 require './web'
