@@ -5,6 +5,7 @@ gem 'actionview', require: 'action_view'
 gem 'activesupport', require: 'active_support'
 gem 'cinch'
 gem 'foreman', group: :development
+gem 'gist'
 gem 'github_api'
 gem 'hashie'
 gem 'memoist'
