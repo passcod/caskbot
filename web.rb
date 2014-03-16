@@ -21,6 +21,8 @@ class Caskbot::Web < Sinatra::Base
         env['HTTP_X_GITHUB_EVENT'],
         JSON.load(params['payload'])
       )
+    else
+      puts env.inspect, params.keys.inspect
     end
     [204,'']
   end
