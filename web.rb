@@ -7,8 +7,7 @@ class Caskbot::Web < Sinatra::Base
 
   post '/dev/null' do
     u = Gist.gist(JSON.dump(env) + "\n\n" + JSON.dump(params) + "\n\n" + request.body.read, {
-      # FIXME: Revoke token once done debugging
-      access_token: 'b04e4e898623dc5dbe63e11b956cbe8418f37540',
+      access_token: Caskbot.config.github_token,
       filename: request.path.gsub('/', '.') + '.txt',
       public: false
     })['html_url']
@@ -20,7 +19,7 @@ class Caskbot::Web < Sinatra::Base
     if env.include? 'HTTP_X_GITHUB_EVENT'
       Caskbot::Hookins::Github.process(
         env['HTTP_X_GITHUB_EVENT'],
-        JSON.load params['payload']
+        JSON.load(params['payload'])
       )
     end
     [204,'']
