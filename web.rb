@@ -17,8 +17,11 @@ class Caskbot::Web < Sinatra::Base
   end
 
   post '/hookin/github' do
-    if params.include? 'payload'
-      Caskbot::Hookin::Github.process params['payload']
+    if env.include? 'HTTP_X_GITHUB_EVENT'
+      Caskbot::Hookins::Github.process(
+        env['HTTP_X_GITHUB_EVENT'],
+        JSON.load params['payload']
+      )
     end
     [204,'']
   end
