@@ -29,6 +29,7 @@ GEM
       thor (>= 0.13.6)
     gist (4.1.1)
       json
+    git_io (0.1.1)
     github_api (0.11.3)
       addressable (~> 2.3)
       descendants_tracker (~> 0.0.1)
@@ -87,6 +88,7 @@ DEPENDENCIES
   cinch
   foreman
   gist
+  git_io
   github_api
   hashie
   memoist

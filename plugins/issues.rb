@@ -47,7 +47,11 @@ class Caskbot::Plugins::Issues
         rep << "by #{actioner}" if actioner
         rep << distance_of_time_in_words_to_now(DateTime.parse date)
         rep << 'ago -'
-        rep << issue.html_url
+        rep << begin
+          GitIo.shorten issue.html_url
+        rescue
+          issue.html_url
+        end
         m.reply rep.join ' '
       end
     end

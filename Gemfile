@@ -7,6 +7,7 @@ gem 'cinch'
 gem 'foreman', group: :development
 gem 'gist'
 gem 'github_api'
+gem 'git_io'
 gem 'hashie'
 gem 'memoist'
 gem 'puma'
