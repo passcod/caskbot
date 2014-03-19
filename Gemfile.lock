@@ -86,6 +86,7 @@ DEPENDENCIES
   actionview
   activesupport
   cinch
+  faraday
   foreman
   gist
   git_io
