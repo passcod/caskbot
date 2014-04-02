@@ -1,18 +1,18 @@
 require 'time'
 
-class Caskbot::Plugins::Badsums
+class Caskbot::Plugins::Audit
   include Cinch::Plugin
   include ActionView::Helpers::DateHelper
 
-  match 'badsums'
-  @@commands = ['badsums']
+  match /audit\s?(.*)/
+  @@commands = ['audit', 'audit summary']
 
-  def execute(m)
+  def summary(m)
     url = 'https://dl.dropboxusercontent.com/u/17915390/CaskTasting.txt'
 
-    summary =  Typhoeus.get(url).body.split("\n")
-    start_date = summary.shift.match(/(?:at\s)(.+)/)[1]
-    finish_date = summary.pop.match(/(?:at\s)(.+)/)[1]
+    summary_lns = Typhoeus.get(url).body.split("\n")
+    start_date  = summary_lns.shift.match(/(?:at\s)(.+)/)[1]
+    finish_date = summary_lns.pop.match(/(?:at\s)(.+)/)[1]
 
     begin
       start_date = DateTime.parse start_date
@@ -26,7 +26,7 @@ class Caskbot::Plugins::Badsums
     nbads = 0
     total = 0
     
-    summary.each do |line|
+    summary_lns.each do |line|
       unless line[0] == ' '
         total += 1
         nfail += 1 if line =~ /download error/
@@ -45,5 +45,11 @@ class Caskbot::Plugins::Badsums
     m.reply "#{nfail} failed downloads (#{pfail}%) and #{nbads} bad checksums (#{pbads}%) - #{nnots} w/o checksum (#{pnots}%) - #{total} casks total"
     m.reply "Last check #{started_ago} ago, took #{time_taken} to complete"
     m.reply "Details at: http://bit.ly/P5ggys"
+  end
+
+  def execute(m, param)
+    if param == "summary" or param == "" or param.nil?
+      summary(m)
+    end
   end
 end
