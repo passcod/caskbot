@@ -26,6 +26,11 @@ class Caskbot::Hookins::Github
         new_issue event.issue if event.action == 'opened'
       when 'pull_request'
         new_issue event.pull_request if event.action == 'opened'
+      when 'create'
+        if event.ref_type == 'tag' && event.ref[0] == 'v'
+          link = GitIo.shorten "https://github.com/phinze/homebrew-cask/releases/tag/#{event.ref}"
+          Caskbot.mainchan.safe_msg "New release! #{event.ref} - #{link}"
+        end
       end
     end
 
