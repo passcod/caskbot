@@ -16,11 +16,8 @@ class Caskbot::Plugins::Issues
   def listen(m)
     m.message.scan(/#(\d+)/).each do |issue|
       begin
-        issue = Caskbot.github.issues.get(
-          Caskbot.config.github_user,
-          Caskbot.config.github_repo,
-          issue[0]
-        )
+        repo = Octokit.repo 'phinze/homebrew-cask'
+        issue = repo.rels[:issues].get(uri: {number: issue[0]}).data
       rescue
         m.reply "##{issue[0]} doesn't exist."
       else
@@ -45,7 +42,7 @@ class Caskbot::Plugins::Issues
         rep << "by #{issue.user.login},"
         rep << issue.state
         rep << "by #{actioner}" if actioner
-        rep << distance_of_time_in_words_to_now(DateTime.parse date)
+        rep << distance_of_time_in_words_to_now(date)
         rep << 'ago -'
         rep << begin
           GitIo.shorten issue.html_url

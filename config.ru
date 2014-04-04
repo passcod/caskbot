@@ -8,11 +8,14 @@ module Caskbot
     attr_accessor :bot
 
     def github
-      Github.new do |c|
-        c.oauth_token = ENV['GITHUB_TOKEN']
-        c.repo = ENV['GITHUB_REPO']
-        c.user = ENV['GITHUB_USER']
+      stack = Faraday::RackBuilder.new do |builder|
+        builder.use Faraday::HttpCache
+        builder.use Octokit::Response::RaiseError
+        builder.adapter Faraday.default_adapter
       end
+
+      Octokit.middleware = stack
+      Octokit::Client.new access_token: ENV['GITHUB_TOKEN']
     end
 
     def config
