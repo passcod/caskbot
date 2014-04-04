@@ -1,5 +1,5 @@
 require 'bundler'
-Bundler.require :default
+Bundler.require :default, (ENV['RACK_ENV'] || 'production').to_sym
 
 module Caskbot
   class << self
