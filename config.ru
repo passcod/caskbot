@@ -25,7 +25,7 @@ module Caskbot
     end
 
     def mainchan
-      Caskbot.bot.channel_list.find ENV['IRC_CHANNELS'].split(',').first
+      Caskbot.bot.channel_list.find ENV['IRC_CHANNELS'].split.first
     end
 
     memoize :github, :config
