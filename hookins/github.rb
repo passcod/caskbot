@@ -4,20 +4,6 @@ require 'time'
 class Caskbot::Hookins::Github
   class << self
     def process(event_type, payload)
-      puts 'Received payload!'
-      
-      puts 'Github: ' + Gist.gist(JSON.dump(payload), {
-        access_token: Caskbot.config.github_token,
-        filename: event_type + '.json',
-        public: false
-      })['html_url']
-
-      puts 'Github (pretty): ' + Gist.gist(JSON.pretty_generate(payload), {
-        access_token: Caskbot.config.github_token,
-        filename: event_type + '.json',
-        public: false
-      })['html_url']
-
       if event_type == 'push'
         %w[created_at pushed_at].each do |field|
           date = DateTime.parse payload['repository'][field]
@@ -25,7 +11,7 @@ class Caskbot::Hookins::Github
         end
       end
 
-      env = Faraday::Env.from \
+      fres = Faraday::Response.new \
         status: 200,
         body: JSON.dump(payload),
         response_headers: {
@@ -33,16 +19,18 @@ class Caskbot::Hookins::Github
           'X-GITHUB-EVENT' => event_type
         }
 
-      wrap = Github::ResponseWrapper.new \
-        Faraday::Response.new(env),
-        Caskbot.github
+      event = Sawyer::Response.new(Caskbot.github.agent, fres).data
 
-      puts 'Github (wrapped): ' + Gist.gist(wrap.inspect, {
-        access_token: Caskbot.config.github_token,
-        filename: event_type + '.rb',
-        public: false
-      })['html_url']
+      case event_type
+      when 'issues'
+        new_issue event.issue if event.action == 'opened'
+      when 'pull_request'
+        new_issue event.pull_request if event.action == 'opened'
+      end
+    end
 
+    def new_issue(issue)
+      Caskbot.mainchan.safe_msg 'New: ' + Caskbot::Plugins::Issues.format_issue(issue)
     end
   end
 end

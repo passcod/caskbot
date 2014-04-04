@@ -22,7 +22,7 @@ class Caskbot::Web < Sinatra::Base
         JSON.load(params['payload'])
       )
     else
-      puts env.inspect, params.keys.inspect
+      puts "Received non-github event on github hook, ignoring."
     end
     [204,'']
   end

@@ -24,6 +24,10 @@ module Caskbot
       return c
     end
 
+    def mainchan
+      Caskbot.bot.channel_list.find ENV['IRC_CHANNELS'].split(',').first
+    end
+
     memoize :github, :config
   end
 
