@@ -1,37 +1,60 @@
 require 'time'
+require 'base64'
 
 class Caskbot::Plugins::Audit
   include Cinch::Plugin
   include ActionView::Helpers::DateHelper
+  extend Memoist
 
   match /audit\s?(.*)/
-  @@commands = ['audit', 'audit summary']
+  @@commands = ['audit', 'audit {summary,}']
 
-  def summary(m)
-    url = 'https://dl.dropboxusercontent.com/u/17915390/CaskTasting.txt'
+  def cmd_summary(m, *params)
+    file = get_file
+    url = Caskbot::Helpers.shorten file._links.html
+    summary = parse file.content
 
-    summary_lns = Typhoeus.get(url).body.split("\n")
-    start_date  = summary_lns.shift.match(/(?:at\s)(.+)/)[1]
-    finish_date = summary_lns.pop.match(/(?:at\s)(.+)/)[1]
+    started_ago = distance_of_time_in_words_to_now summary.started
 
+    m.reply "#{summary.errors.amount} failed downloads (#{summary.errors.percent}%) and #{summary.mismatch.amount} bad checksums (#{summary.mismatch.percent}%) - #{summary.no_sums.amount} w/o checksum (#{summary.no_sums.percent}%) - #{summary.total} casks total"
+    m.reply "Last check #{started_ago} ago. Details at: #{url}"
+  end
+
+  def try_date(date)
     begin
-      start_date = DateTime.parse start_date
-      finish_date = DateTime.parse finish_date
+      DateTime.parse date
     rescue
-      start_date = finish_date = DateTime.now
+      DateTime.now
     end
+  end
+
+  def parse(file)
+    f = file.split("\n")
+    r = {}
+    r[:started]  = try_date f.shift.match(/(?:at\s)(.+)/)[1]
     
     nfail = 0
     nnots = 0
     nbads = 0
     total = 0
+    tests = []
+    infos = {}
     
-    summary_lns.each do |line|
-      unless line[0] == ' '
+    f.each do |line|
+      if line[0] == ' '
+        t, s = line.split ':', 2
+        infos[tests.last][:_data] << line
+        infos[tests.last][t.strip.downcase.to_sym] = s.strip if s
+      else
+        t, s = line.split ':', 2
+        t.strip!
+        tests << t
+        infos[t] = {_data: [], status: s.strip}
+
         total += 1
-        nfail += 1 if line =~ /download error/
-        nnots += 1 if line =~ /no checksum/
-        nbads += 1 if line =~ /mismatch/
+        nfail += 1 if s =~ /download error/
+        nnots += 1 if s =~ /no checksum/
+        nbads += 1 if s =~ /mismatch/
       end
     end
 
@@ -39,17 +62,37 @@ class Caskbot::Plugins::Audit
     pnots = (nnots * 100.0 / total).round 1
     pbads = (nbads * 100.0 / total).round 1
 
-    started_ago = distance_of_time_in_words_to_now start_date
-    time_taken = distance_of_time_in_words start_date, finish_date
+    r[:casks] = infos
+    r[:total] = total
+    r[:errors] = {amount: nfail, percent: pfail}
+    r[:no_sums] = {amount: nnots, percent: pnots}
+    r[:mismatch] = {amount: nbads, percent: pbads}
 
-    m.reply "#{nfail} failed downloads (#{pfail}%) and #{nbads} bad checksums (#{pbads}%) - #{nnots} w/o checksum (#{pnots}%) - #{total} casks total"
-    m.reply "Last check #{started_ago} ago, took #{time_taken} to complete"
-    m.reply "Details at: http://bit.ly/P5ggys"
+    Hashie::Mash.new r
+  end
+
+  def repo
+    Caskbot.github.repo('alebcay/cask-tasting')
+  end
+
+  def get_file(ref = nil)
+    opts = {path: 'CaskTasting.txt'}
+    opts[:ref] = ref if ref
+    f = repo.rels[:contents].get(uri: opts).data
+    f.content = Base64.decode64 f.content if f.encoding == 'base64'
+    return f
   end
 
   def execute(m, param)
-    if param == "summary" or param == "" or param.nil?
-      summary(m)
+    param ||= ''
+    call, params = param.split /\s+/, 2
+    if call
+      params ||= []
+      send "cmd_#{call}".to_sym, m, *params
+    else
+      send :cmd_summary, m
     end
   end
+
+  memoize :parse, :repo, :try_date
 end
