@@ -21,17 +21,27 @@ class Caskbot::Hookins::Github
 
       event = Sawyer::Response.new(Caskbot.github.agent, fres).data
 
-      case event_type
-      when 'issues'
-        new_issue event.issue if event.action == 'opened'
-      when 'pull_request'
-        new_issue event.pull_request if event.action == 'opened'
-      when 'create'
-        if event.ref_type == 'tag' && event.ref[0] == 'v'
-          link = GitIo.shorten "https://github.com/phinze/homebrew-cask/releases/tag/#{event.ref}"
-          Caskbot.mainchan.safe_msg "New release! #{event.ref} - #{link}"
-        end
+      send event_type.to_s, event
+    end
+
+    def issues(event)
+      new_issue event.issue if event.action == 'opened'
+    end
+
+    def pull_request(event)
+      new_issue event.pull_request if event.action == 'opened'
+    end
+
+    def create(event)
+      if event.ref_type == 'tag' && event.ref[0] == 'v'
+        link = GitIo.shorten "https://github.com/phinze/homebrew-cask/releases/tag/" +
+          event.ref
+        Caskbot.mainchan.safe_msg "New release! #{event.ref} - #{link}"
       end
+    end
+
+    def method_missing(name, args, block)
+      puts "Event not handled: #{name}"
     end
 
     def new_issue(issue)
