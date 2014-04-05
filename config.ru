@@ -28,7 +28,11 @@ module Caskbot
       Caskbot.bot.channel_list.find ENV['IRC_CHANNELS'].split.first
     end
 
-    memoize :github, :config
+    def root
+      __dir__
+    end
+
+    memoize :github, :config, :root
   end
 
   module Plugins
@@ -47,6 +51,7 @@ end
 Dir['./hookins/*.rb'].each { |p| require p }
 Dir['./plugins/*.rb'].each { |p| require p }
 require './bot'
+require './helpers'
 require './web'
 
 Thread.new { Caskbot.bot.start }

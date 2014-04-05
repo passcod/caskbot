@@ -86,5 +86,6 @@ DEPENDENCIES
   pry
   puma
   sinatra
+  tilt
   timers
   typhoeus

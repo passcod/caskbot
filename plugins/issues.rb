@@ -14,11 +14,14 @@ class Caskbot::Plugins::Issues
 
   class << self
     include ActionView::Helpers::DateHelper
+    extend Memoist
 
     def format_issue(issue)
       is_pr = issue.html_url.split('/').reverse[1] == 'pull'
+
       date, actioner, comments = case issue.state
       when 'closed'
+        puts 'up'
         [issue.closed_at, issue.closed_by.login, nil]
       when 'open'
         issue.state = 'opened'
@@ -29,24 +32,22 @@ class Caskbot::Plugins::Issues
         [issue.created_at, issue.user.login, issue.comments]
       end
 
+      r = template.render(Object.new, {
+        actioner: actioner,
+        issue: issue,
+        is_pr: is_pr,
+        time_ago: distance_of_time_in_words_to_now(date),
+        url: Caskbot::Helpers.shorten(issue.html_url)
+      })
 
-      rep = []
-      rep << "##{issue.number}:"
-      rep << 'PR' if is_pr
-      rep << "\"#{issue.title}\""
-      rep << "by #{issue.user.login},"
-      rep << issue.state
-      rep << "by #{actioner}" if actioner
-      rep << distance_of_time_in_words_to_now(date)
-      rep << 'ago -'
-      rep << begin
-        GitIo.shorten issue.html_url
-      rescue
-        issue.html_url
-      end
-
-      rep.join ' '
+      r.gsub /\s+/, ' '
     end
+
+    def template
+      Tilt.new(Caskbot.root + '/templates/issue.str')
+    end
+
+    memoize :template 
   end
 
   def listen(m)
@@ -54,8 +55,12 @@ class Caskbot::Plugins::Issues
       begin
         repo = Octokit.repo 'phinze/homebrew-cask'
         issue = repo.rels[:issues].get(uri: {number: issue[0]}).data
+      rescue Octokit::TooManyRequests, Octokit::TooManyLoginAttempts
+        m.reply 'Rate-limited, try again later'
+      rescue Octokit::NotFound, Octokit::Forbidden
+        m.reply "##{issue[0]} doesn't exist"
       rescue
-        m.reply "##{issue[0]} doesn't exist."
+        m.reply 'Unknown error. Maintainers, check the Heroku logs'
       else
         m.reply self.class.format_issue issue
       end
