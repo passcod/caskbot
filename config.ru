@@ -63,7 +63,6 @@ end
 Dir['./hookins/*.rb'].each { |p| require p }
 Dir['./plugins/*.rb'].each { |p| require p }
 require './bot'
-require './helpers'
 require './web'
 
 Thread.new { Caskbot.bot.start }

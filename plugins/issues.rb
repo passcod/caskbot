@@ -38,7 +38,7 @@ class Caskbot::Plugins::Issues
         issue: issue,
         is_pr: is_pr,
         time_ago: distance_of_time_in_words_to_now(date),
-        url: Caskbot::Helpers.shorten(issue.html_url)
+        url: Caskbot.shorten(issue.html_url)
       })
 
       r.gsub /\s+/, ' '

@@ -11,13 +11,15 @@ class Caskbot::Plugins::Audit
 
   def cmd_summary(m, *params)
     file = get_file
-    url = Caskbot::Helpers.shorten file._links.html
     summary = parse file.content
 
-    started_ago = distance_of_time_in_words_to_now summary.started
-
-    m.reply "#{summary.errors.amount} failed downloads (#{summary.errors.percent}%) and #{summary.mismatch.amount} bad checksums (#{summary.mismatch.percent}%) - #{summary.no_sums.amount} w/o checksum (#{summary.no_sums.percent}%) - #{summary.total} casks total"
-    m.reply "Last check #{started_ago} ago. Details at: #{url}"
+    r = Caskbot.template('audit_summary.hbs').render(Object.new, {
+      summary: summary,
+      started_ago: distance_of_time_in_words_to_now(summary.started),
+      url: Caskbot.shorten(file._links.html)
+    }).gsub(/\s+/, ' ').split('{NL}').each do |line|
+      m.reply line.strip
+    end
   end
 
   def try_date(date)

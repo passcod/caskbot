@@ -34,9 +34,13 @@ class Caskbot::Hookins::Github
 
     def create(event)
       if event.ref_type == 'tag' && event.ref[0] == 'v'
-        link = GitIo.shorten "https://github.com/phinze/homebrew-cask/releases/tag/" +
-          event.ref
-        Caskbot.mainchan.safe_msg "New release! #{event.ref} - #{link}"
+        link = 'https://github.com/phinze/homebrew-cask/releases/tag/'
+        Caskbot.mainchan.safe_msg Caskbot
+          .template('new_release.hbs')
+          .render(Object.new, {
+            version: event.ref.slice(1, event.ref.length),
+            url: Caskbot.shorten(link + event.ref)
+          })
       end
     end
 
