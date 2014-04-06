@@ -36,7 +36,15 @@ module Caskbot
       Tilt.new(root + '/templates/' + file)
     end
 
-    memoize :github, :config, :root, :template
+    def shorten(url)
+      begin
+        GitIo.shorten url
+      rescue
+        url
+      end
+    end
+
+    memoize :config, :github, :root, :shorten, :template
   end
 
   module Plugins
