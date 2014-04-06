@@ -45,7 +45,7 @@ class Caskbot::Hookins::Github
     end
 
     def new_issue(issue)
-      Caskbot.mainchan.safe_msg 'New: ' + Caskbot::Plugins::Issues.format_issue(issue)
+      Caskbot.mainchan.safe_msg Caskbot::Plugins::Issues.format_issue(issue, template: 'new_issue.hbs')
     end
   end
 end

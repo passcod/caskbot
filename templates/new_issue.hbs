@@ -1,0 +1,12 @@
+New
+{{#if is_pr}}
+  PR
+{{else}}
+  issue
+{{/if}}
+
+#{{issue.number}}:
+
+"{{issue.title}}" by {{issue.user.login}}
+
+- {{url}}
