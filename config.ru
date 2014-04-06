@@ -32,7 +32,11 @@ module Caskbot
       __dir__
     end
 
-    memoize :github, :config, :root
+    def template(file)
+      Tilt.new(root + '/templates/' + file)
+    end
+
+    memoize :github, :config, :root, :template
   end
 
   module Plugins

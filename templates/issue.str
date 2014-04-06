@@ -1,6 +1,0 @@
-##{ issue.number }:
-#{ is_pr ? 'PR' : '' }
-"#{ issue.title }" by #{ issue.user.login },
-#{ issue.state }
-#{ actioner ? 'by ' + actioner : '' }
-#{ time_ago } ago - #{ url }

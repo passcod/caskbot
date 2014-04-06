@@ -1,0 +1,14 @@
+#{{issue.number}}:
+{{#if is_pr}}
+  PR
+{{/if}}
+
+"{{issue.title}}" by {{issue.user.login}},
+
+{{issue.state}}
+{{#if actioner}}
+  by {{actioner}}
+{{/if}}
+
+{{time_ago}} ago
+- {{url}}

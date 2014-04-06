@@ -16,7 +16,8 @@ class Caskbot::Plugins::Issues
     include ActionView::Helpers::DateHelper
     extend Memoist
 
-    def format_issue(issue)
+    def format_issue(issue, opts = {})
+      opts[:template] ||= 'issue.hbs'
       is_pr = issue.html_url.split('/').reverse[1] == 'pull'
 
       date, actioner, comments = case issue.state
@@ -32,7 +33,7 @@ class Caskbot::Plugins::Issues
         [issue.created_at, issue.user.login, issue.comments]
       end
 
-      r = template.render(Object.new, {
+      r = Caskbot.template(opts[:template]).render(Object.new, {
         actioner: actioner,
         issue: issue,
         is_pr: is_pr,
@@ -42,12 +43,6 @@ class Caskbot::Plugins::Issues
 
       r.gsub /\s+/, ' '
     end
-
-    def template
-      Tilt.new(Caskbot.root + '/templates/issue.str')
-    end
-
-    memoize :template 
   end
 
   def listen(m)
