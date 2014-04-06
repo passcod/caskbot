@@ -5,6 +5,6 @@ class Caskbot::Plugins::About
   @@commands = ['about']
 
   def execute(m)
-    m.reply Caskbot.template('about.hbs').render
+    m.reply Caskbot.template('about').render
   end
 end

@@ -33,7 +33,7 @@ module Caskbot
     end
 
     def template(file)
-      Tilt.new(root + '/templates/' + file)
+      Tilt.new(root + '/templates/' + file + '.hbs')
     end
 
     def shorten(url)

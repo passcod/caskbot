@@ -13,7 +13,7 @@ class Caskbot::Plugins::Audit
     file = get_file
     summary = parse file.content
 
-    r = Caskbot.template('audit_summary.hbs').render(Object.new, {
+    r = Caskbot.template('audit_summary').render(Object.new, {
       summary: summary,
       started_ago: distance_of_time_in_words_to_now(summary.started),
       url: Caskbot.shorten(file._links.html)

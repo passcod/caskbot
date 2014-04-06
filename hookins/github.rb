@@ -36,7 +36,7 @@ class Caskbot::Hookins::Github
       if event.ref_type == 'tag' && event.ref[0] == 'v'
         link = 'https://github.com/phinze/homebrew-cask/releases/tag/'
         Caskbot.mainchan.safe_msg Caskbot
-          .template('new_release.hbs')
+          .template('new_release')
           .render(Object.new, {
             version: event.ref.slice(1, event.ref.length),
             url: Caskbot.shorten(link + event.ref)
@@ -49,7 +49,7 @@ class Caskbot::Hookins::Github
     end
 
     def new_issue(issue)
-      Caskbot.mainchan.safe_msg Caskbot::Plugins::Issues.format_issue(issue, template: 'new_issue.hbs')
+      Caskbot.mainchan.safe_msg Caskbot::Plugins::Issues.format_issue(issue, template: 'new_issue')
     end
   end
 end

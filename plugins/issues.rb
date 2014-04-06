@@ -17,7 +17,7 @@ class Caskbot::Plugins::Issues
     extend Memoist
 
     def format_issue(issue, opts = {})
-      opts[:template] ||= 'issue.hbs'
+      opts[:template] ||= 'issue'
       is_pr = issue.html_url.split('/').reverse[1] == 'pull'
 
       date, actioner, comments = case issue.state

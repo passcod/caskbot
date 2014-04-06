@@ -15,7 +15,7 @@ class Caskbot::Plugins::Hash
         info "[hash] Getting checksum for #{url}"
       else
         info "[hash] Failed getting #{url}"
-        m.reply Caskbot.template('hash_fail.hbs').render Object.new, {
+        m.reply Caskbot.template('hash_fail').render Object.new, {
           url: url,
           code: res.code,
           response: res
@@ -29,7 +29,7 @@ class Caskbot::Plugins::Hash
     end
 
     request.on_complete do |res|
-      m.reply Caskbot.template('hash.hbs').render Object.new, {
+      m.reply Caskbot.template('hash').render Object.new, {
         hash: digest.hexdigest,
         url: url
       }
