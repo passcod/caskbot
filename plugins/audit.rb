@@ -7,7 +7,7 @@ class Caskbot::Plugins::Audit
   extend Memoist
 
   match /audit\s?(.*)/
-  @@commands = ['audit', 'audit {summary,}']
+  @@commands = ['audit [summary]']
 
   def cmd_summary(m, *params)
     file = get_file
