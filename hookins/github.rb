@@ -44,7 +44,7 @@ class Caskbot::Hookins::Github
       end
     end
 
-    def method_missing(name, args, block)
+    def method_missing(name, *args, &block)
       puts "Event not handled: #{name}"
     end
 
