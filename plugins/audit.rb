@@ -7,19 +7,36 @@ class Caskbot::Plugins::Audit
   extend Memoist
 
   match /audit\s?(.*)/
-  @@commands = ['audit [summary]']
+  @@commands = ['audit [summary|search]']
+  @@summary = nil
 
   def cmd_summary(m, *params)
     file = get_file
-    summary = parse file.content
+    @@summary = parse file.content
 
     r = Caskbot.template('audit_summary').render(Object.new, {
-      summary: summary,
-      started_ago: distance_of_time_in_words_to_now(summary.started),
+      summary: @@summary,
+      started_ago: distance_of_time_in_words_to_now(@@summary.started),
       url: Caskbot.shorten(file._links.html)
     }).gsub(/\s+/, ' ').split('{NL}').each do |line|
       m.reply line.strip
     end
+  end
+
+  def cmd_search(m, *params)
+    return m.reply 'Need to run !audit summary once first' unless @@summary
+    return m.reply 'Usage: audit search PATTERN' unless params && params.length > 0
+    
+    pattern = params.join ' '
+    matches = @@summary.casks.keys.grep(/#{pattern}/).sort
+    matches.map! { |cask| "#{cask}: #{@@summary.casks[cask].status}" }
+    
+    joined = matches.first(5).join(', ')
+    if matches.length > 5
+      gist = Caskbot.gisten matches.join("\n"), 'Audit search results'
+      joined += "and #{matches.length - 5} others: #{gist}"
+    end
+    m.reply joined
   end
 
   def try_date(date)

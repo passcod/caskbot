@@ -75,15 +75,6 @@ class Caskbot::Plugins::Search
     end.flatten.sort
   end
 
-  def gisted(list)
-    gist = Gist.gist(list.join("\n"), {
-      filename: 'Cask search results',
-      public: false,
-      anonymous: true
-    })
-    Caskbot.shorten gist['html_url']
-  end
-
   def execute(m, param)
     param ||= ''
     param.strip!
@@ -96,11 +87,12 @@ class Caskbot::Plugins::Search
       list = get_list repos, args[:pattern]
       joined = list.first(5).join(', ')
       if list.length > 5
-        joined += " and #{list.length - 5} others: #{gisted(list)}"
+        gist = Caskbot.gisten list.join("\n"), 'Cask search results'
+        joined += " and #{list.length - 5} others: #{gist}"
       end
       m.reply joined
     end
   end
 
-  memoize :get_casklist, :gisted, :parse_arguments
+  memoize :get_casklist, :parse_arguments
 end

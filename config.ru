@@ -44,7 +44,14 @@ module Caskbot
       end
     end
 
-    memoize :config, :github, :root, :shorten, :template
+    def gisten(filename, contents, opts = {})
+      opts[:filename] ||= filename
+      opts[:public] ||= false
+      opts[:anonymous] ||= true
+      Caskbot.shorten Gist.gist(contents, opts)['html_url']
+    end
+
+    memoize :config, :gisten, :github, :root, :shorten, :template
   end
 
   module Plugins
