@@ -87,7 +87,7 @@ class Caskbot::Plugins::Search
       list = get_list repos, args[:pattern]
       joined = list.first(5).join(', ')
       if list.length > 5
-        gist = 'Cask search results', Caskbot.gisten list.join("\n")
+        gist = Caskbot.gisten 'Cask search results', list.join("\n")
         joined += " and #{list.length - 5} others: #{gist}"
       end
       joined = 'No results.' if list.length == 0
