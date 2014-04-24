@@ -6,7 +6,7 @@ class Caskbot::Hookins::Github
     def process(event_type, payload)
       if event_type == 'push'
         %w[created_at pushed_at].each do |field|
-          date = DateTime.parse payload['repository'][field]
+          date = Time.at(payload['repository'][field]).utc.to_datetime
           payload['repository'][field] = date
         end
       end
