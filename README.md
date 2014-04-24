@@ -71,7 +71,10 @@ Streamload URLs and compute their SHA256 checksum.
 ### Audit checking
 Fetch results from cask tastings.
 
+### Search
+Search casks.
+
 ## Community
 
-Created by @passcod for @caskroom, Public Domain.
+Created by @passcod for @caskroom, [Public Domain](https://passcod.name/PUBLIC.txt).
 
