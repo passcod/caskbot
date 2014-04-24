@@ -90,6 +90,7 @@ class Caskbot::Plugins::Search
         gist = Caskbot.gisten list.join("\n"), 'Cask search results'
         joined += " and #{list.length - 5} others: #{gist}"
       end
+      joined = 'No results.' if list.length == 0
       m.reply joined
     end
   end
