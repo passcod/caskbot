@@ -33,7 +33,7 @@ class Caskbot::Plugins::Audit
     
     joined = matches.first(5).join(', ')
     if matches.length > 5
-      gist = Caskbot.gisten matches.join("\n"), 'Audit search results'
+      gist = Caskbot.gisten 'Audit search results', matches.join("\n")
       joined += " and #{matches.length - 5} others: #{gist}"
     end
     joined = 'No results.' if matches.length == 0
