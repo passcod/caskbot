@@ -34,7 +34,7 @@ class Caskbot::Hookins::Github
 
     def create(event)
       if event.ref_type == 'tag' && event.ref[0] == 'v'
-        link = 'https://github.com/phinze/homebrew-cask/releases/tag/'
+        link = 'https://github.com/caskroom/homebrew-cask/releases/tag/'
         Caskbot.mainchan.safe_msg Caskbot
           .template('new_release')
           .render(Object.new, {

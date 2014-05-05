@@ -12,9 +12,7 @@ class Caskbot::Plugins::Search
 
   def get_casklist(repo)
     unless %r{/} =~ repo
-      repo = if repo == 'cask' or repo == 'homebrew-cask'
-        'phinze/homebrew-cask'
-      elsif %r{^homebrew-} =~ repo
+      repo = if %r{^homebrew-} =~ repo
         "caskroom/#{repo}"
       else
         "caskroom/homebrew-#{repo}"

@@ -48,7 +48,7 @@ class Caskbot::Plugins::Issues
   def listen(m)
     m.message.scan(/#(\d+)/).each do |issue|
       begin
-        repo = Octokit.repo 'phinze/homebrew-cask'
+        repo = Octokit.repo 'caskroom/homebrew-cask'
         issue = repo.rels[:issues].get(uri: {number: issue[0]}).data
       rescue Octokit::TooManyRequests, Octokit::TooManyLoginAttempts
         m.reply 'Rate-limited, try again later'
