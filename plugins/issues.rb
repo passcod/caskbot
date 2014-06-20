@@ -54,8 +54,9 @@ class Caskbot::Plugins::Issues
         m.reply 'Rate-limited, try again later'
       rescue Octokit::NotFound, Octokit::Forbidden
         m.reply "##{issue[0]} doesn't exist"
-      rescue
+      rescue => e
         m.reply 'Unknown error. Maintainers, check the Heroku logs'
+        raise e
       else
         m.reply self.class.format_issue issue
       end
