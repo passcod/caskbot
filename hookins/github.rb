@@ -21,18 +21,18 @@ class Caskbot::Hookins::Github
 
       event = Sawyer::Response.new(Caskbot.github.agent, fres).data
 
-      send event_type.to_s, event
+      send '_' + event_type.to_s, event
     end
 
-    def issues(event)
+    def _issues(event)
       new_issue event.issue if event.action == 'opened'
     end
 
-    def pull_request(event)
+    def _pull_request(event)
       new_issue event.pull_request if event.action == 'opened'
     end
 
-    def create(event)
+    def _create(event)
       if event.ref_type == 'tag' && event.ref[0] == 'v'
         link = 'https://github.com/caskroom/homebrew-cask/releases/tag/'
         Caskbot.mainchan.safe_msg Caskbot
@@ -45,10 +45,10 @@ class Caskbot::Hookins::Github
     end
 
     def method_missing(name, *args, &block)
-      puts "Event not handled: #{name}"
+      puts "Event not handled: #{name[1..name.length]}"
     end
 
-    def new_issue(issue)
+    def _new_issue(issue)
       Caskbot.mainchan.safe_msg Caskbot::Plugins::Issues.format_issue(issue, template: 'new_issue')
     end
   end
