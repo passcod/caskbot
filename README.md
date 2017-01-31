@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/passcod/caskbot.png)](https://codeclimate.com/github/passcod/caskbot)
+[![Code Climate](https://codeclimate.com/github/passcod/caskbot.svg)](https://codeclimate.com/github/passcod/caskbot)
 
 Caskbot
 =======
